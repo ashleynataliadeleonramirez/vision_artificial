@@ -1,0 +1,115 @@
+Primitivas Geométricas y Transformaciones
+import numpy as np
+import cv2
+def muestra_imagen(imagen):
+    cv2.imshow("Canvas base", imagen)
+    cv2.waitKey(0)
+w = 250
+h = 250
+
+imagen_base = np.zeros((w, h))
+muestra_imagen(imagen_base)
+def obtener_homogeneas(coordenadas_2D, w):
+    return np.hstack([coordenadas_2D, w])
+
+def obtener_2D(coordenadas_homogeneas):
+    return cv2.convertPointsFromHomogeneous(coordenadas_homogeneas)
+# Slicing
+imagen_base[int(w/2-25):int(w/2+25), int(h/2-25):int(h/2+25)] = 100
+muestra_imagen(imagen_base)
+
+x = 100
+y = 100
+escala = 1
+
+# Punto 2D
+p = [x, y]
+# Punto 2D Coordenadas Homogeneas
+p_h = np.array([[x, y, escala]])
+Transformaciones Euclideanas
+class TransformacionesEuclideanas:
+    @staticmethod
+    def rotacion(angulo, s=1):
+        return np.array([
+            [s*np.cos(angulo), -s*np.sin(angulo), 0],
+            [s*np.sin(angulo), s*np.cos(angulo), 0],
+            [0, 0, 1]
+        ])
+    
+    @staticmethod
+    def traslado(x,y):
+        return np.array([
+            [1, 0, x],
+            [0, 1, y],
+            [0, 0, 1]
+        ])
+    
+    @staticmethod
+    def reflexion(eje='x'):
+        if eje == 'x':  # Refleja sobre eje Y
+            return np.array([[-1, 0, 0],
+                             [0, 1, 0],
+                             [0, 0, 1]])
+        elif eje == 'y':  # Refleja sobre eje X
+            return np.array([[1, 0, 0],
+                             [0, -1, 0],
+                             [0, 0, 1]])
+        elif eje == 'origen':  # Refleja sobre origen
+            return np.array([[-1, 0, 0],
+                             [0, -1, 0],
+                             [0, 0, 1]])
+ruta = "ovalo.png"
+imagen_base = cv2.imread(ruta, cv2.IMREAD_GRAYSCALE)
+h,w = imagen_base.shape
+imagen_transformada = np.zeros((h, w), dtype=imagen_base.dtype)
+
+centro_x, centro_y = int(round(h/2)), int(round(w/2))
+
+# Matrices individuales
+Ref = TransformacionesEuclideanas.reflexion('y')
+R = TransformacionesEuclideanas.rotacion(0.05,6)
+T1 = TransformacionesEuclideanas.traslado(-centro_x, -centro_y)
+T2 = TransformacionesEuclideanas.traslado(centro_x, -centro_y)
+
+# Matriz compuesta
+T = Ref @ T2 @ R @ T1
+
+# Matriz inversa
+M_inv = np.linalg.inv(T)
+
+for x in range(w):
+    for y in range(h):
+        p_destino_h = np.array([x, y, 1])
+        p_origen_h = M_inv @ p_destino_h
+
+        x_origen = p_origen_h[0] / p_origen_h[2]
+        y_origen = p_origen_h[1] / p_origen_h[2]
+
+        if 0 <= x_origen < w and 0 <= y_origen < h:
+            y_idx = int(np.floor(y_origen))
+            x_idx = int(np.floor(x_origen))
+            imagen_transformada[y, x] = imagen_base[y_idx, x_idx]
+
+muestra_imagen(imagen_transformada)
+
+# -----------------------------
+# IMPRESIÓN DE MATRICES
+# -----------------------------
+np.set_printoptions(precision=3, suppress=True)
+
+print("\nMatriz de Rotación (R):")
+print(R)
+
+print("\nMatriz de Traslación al origen (T1):")
+print(T1)
+
+print("\nMatriz de Regreso al centro (T2):")
+print(T2)
+
+print("\nMatriz de Transformación Total (T = T2 @ R @ T1):")
+print(T)
+
+print("\nMatriz Inversa utilizada (M_inv):")
+print(M_inv)
+print(obtener_homogeneas(p, escala))
+print(obtener_2D(p_h))
