@@ -1,1 +1,12 @@
-
+Instrucciones de Entrega Parte Práctica Examen U2
+* Procesar las 15 imágenes en la carpeta anexa de los dados. Los resultados esperados por cada imagen se encuentran en las sub-carpeta Annotations.
+* Usando las herramientas vistas en clase, implemente un programa que procese imágenes de diferentes cantidades de dados en la escena.
+	- Realice el conteo del total de dados en la imagen.
+	- Al reconocer cada dado por individual, que el programa reconozca el valor de la cara del dado visible (número de puntos).	
+Realice el pre-procesamiento necesario (ajuste de brillo, contraste, morfológicas, etc.) y emplee conectividad de componentes para obtener los resultados deseados. Considere en su implementación la escalabilidad y reusabilidad.
+Entregar los resultados en formato IEEE anexando lo siguiente:
+1. Descripción del problema a resolver.
+2. Código propuesto para la resolución (sin identación, sin espaciado entre líneas, compacto, con fuente apropiada (p.e. courier)).
+3. Tabla comparativa para cada una de las imágenes: Nombre de la imagen | Número de dados detectados | Número de dados reales en la imagen | Números en las caras de los dados detectados | Números de las caras de los dados reales
+4. Calcular el error medio de todas las imagenes. Uno para Número de dados, otro para las caras detectadas.
+5. Anexar el código a su repositorio de github, y agregar la liga al reporte.
